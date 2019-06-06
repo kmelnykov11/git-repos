@@ -1,0 +1,23 @@
+ public IEmailService EmailService { get; set; }
+        public IWebService WebService { get; set; }
+
+        public LogAn(IEmailService emailService, IWebService webService)
+        {
+            this.EmailService = emailService;
+            this.WebService = webService;
+        }
+
+        public void Analyze(string fileName)
+        {
+            if (fileName.Length < 8)
+            {
+                try
+                {
+                    WebService.LogError("Filename too short:" + fileName);
+                }
+                catch (Exception e)
+                {
+                    EmailService.SendEmail("someone@somewhere.com", "can't log", e.Message);
+                }
+            }
+        }
