@@ -1,0 +1,43 @@
+[Fact]
+        public void Analyze_WebServiceThrows_SendsEmail()
+        {
+            FakeWebService fakeWeb = new FakeWebService();
+            FakeEmailService fakeEmail = new FakeEmailService();
+            fakeWeb.ToThrow = new Exception("fake exception");
+
+            LogAn log = new LogAn(fakeEmail, fakeWeb);
+
+            string tooShortFileName = "abc.ext";
+            log.Analyze(tooShortFileName);
+
+            Assert.Contains("someone@somewhere.com", fakeEmail.To);
+            Assert.Contains("can't log", fakeEmail.Subject);
+            Assert.Contains("fake exception", fakeEmail.Body);
+        }
+    }
+
+
+
+    public class FakeWebService : IWebService
+    {
+        public Exception ToThrow;
+
+        public void LogError(string message)
+        {
+            if (ToThrow != null)
+                throw ToThrow;
+        }
+    }
+
+    public class FakeEmailService : IEmailService
+    {
+        public string To;
+        public string Subject;
+        public string Body;
+
+        public void SendEmail(string to, string subject, string body)
+        {
+            To = to;
+            Subject = subject;
+            Body = body;
+        }
